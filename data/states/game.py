@@ -18,7 +18,7 @@ class Game(tools.States):
         self.bg_color = (255,255,255)
         self.setup_btns()
         self.current_color = None
-        self.next_color = None
+        self.chosen_color = None
         self.turns = 0
         self.max_turns = 25
         self.update_label()
@@ -80,19 +80,24 @@ class Game(tools.States):
         if self.turns == self.max_turns +1: #game over
             self.in_game = False
             self.turns = self.max_turns
+            for button in self.buttons:
+                button.disabled = True
         else:
-            self.next_color = color
+            self.chosen_color = color
     
     def create_table(self):
         self.table = []
         for i in range(14):
             for j in range(14):
                 self.table.append(block.Block(self.color_options, (i*25+self.block_bufferX,j*25+self.block_bufferY)))
+        self.current_color = self.table[0].start_color
 
     def reset_game(self, button_sound=True):
         self.in_game = True
         self.turns = 0
         self.create_table()
+        for button in self.buttons:
+            button.disabled = False
         if button_sound:
             self.button_click.sound.play()
         
@@ -110,7 +115,8 @@ class Game(tools.States):
         #    pg.mixer.music.load(self.bg_music.tracks[self.bg_music.track]) 
         #    pg.mixer.music.play()
         for button in self.buttons:
-            button.check_event(event)
+            if not button.disabled:
+                button.check_event(event)
         self.menu_button.check_event(event)
                     
     def update(self, now, keys):

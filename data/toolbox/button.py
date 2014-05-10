@@ -27,8 +27,10 @@ class Button(object):
             "clicked_font_color": None,
             "click_sound"       : None,
             "hover_sound"       : None,
-            'border_color'   : pg.Color('black'),
-            'border_hover_color'   : pg.Color('yellow'),
+            'border_color'      : pg.Color('black'),
+            'border_hover_color': pg.Color('yellow'),
+            'disabled'          : False,
+            'disabled_color'     : pg.Color('grey')
         }
         for kwarg in kwargs:
             if kwarg in settings:
@@ -82,18 +84,21 @@ class Button(object):
         """Update needs to be called every frame in the main loop."""
         color = self.color
         text = self.text
-        self.check_hover()
-        if self.clicked and self.clicked_color:
-            color = self.clicked_color
-            if self.clicked_font_color:
-                text = self.clicked_text
-        elif self.hovered and self.hover_color:
-            color = self.hover_color
-            if self.hover_font_color:
-                text = self.hover_text
         border = self.border_color
-        if self.hovered and not self.clicked:
-            border = self.border_hover_color
+        self.check_hover()
+        if not self.disabled:
+            if self.clicked and self.clicked_color:
+                color = self.clicked_color
+                if self.clicked_font_color:
+                    text = self.clicked_text
+            elif self.hovered and self.hover_color:
+                color = self.hover_color
+                if self.hover_font_color:
+                    text = self.hover_text
+            if self.hovered and not self.clicked:
+                border = self.border_hover_color
+        else:
+            color = self.disabled_color
         surface.fill(border,self.rect)
         surface.fill(color,self.rect.inflate(-4,-4))
         if self.text:
