@@ -23,13 +23,13 @@ if __name__ == '__main__':
     if args['difficulty']:
         if args['difficulty'].lower() in accepted_difficulty:
             difficulty = args['difficulty'].lower()
-            print('difficulty: {}'.format(difficulty))
+            #print('difficulty: {}'.format(difficulty))
         else:
             print('{} is not a valid difficulty option, {}'.format(args['difficulty'], accepted_difficulty))
             sys.exit()
     if args['size']:
         size = args['size']
-        print('window size: {}'.format(size))
+        #print('window size: {}'.format(size))
         
     if args['clean']:
         data.tools.clean_files()
