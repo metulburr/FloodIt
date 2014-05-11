@@ -23,9 +23,9 @@ class Game(tools.States):
         self.turns = 0
         self.number_of_blocks_wide = 14
         self.number_of_blocks_high = 14
-        self.block_offsetY = 25
-        self.block_offsetX = 25
-        self.block_bufferX = 135
+        self.block_offsetY = 26
+        self.block_offsetX = 26
+        self.block_bufferX = 127
         self.block_bufferY = 12
         self.max_turns = 25
         self.table = []
@@ -39,7 +39,11 @@ class Game(tools.States):
         self.overlay.fill(0)
         self.overlay.set_alpha(200)
         
-
+        self.board_bg_offset = 1
+        self.board_bg = pg.Surface(
+            [self.number_of_blocks_wide*self.block_offsetX+(self.board_bg_offset), self.number_of_blocks_high*self.block_offsetY+(self.board_bg_offset*2),]
+            ).convert()
+        self.board_bg.fill((0,0,0))
         
     def update_label(self):
         text = "Turns: {} / {}".format(self.turns, self.max_turns)
@@ -201,6 +205,7 @@ class Game(tools.States):
         
     def render(self, screen):
         screen.fill((self.bg_color))
+        screen.blit(self.board_bg, (self.block_bufferX-self.board_bg_offset, self.block_bufferY-self.board_bg_offset))
         for button in self.buttons:
             button.render(screen)
         for row in self.table:
