@@ -112,6 +112,7 @@ class Game(tools.States):
         self.button_click.sound.play()
         self.turns += 1
         if self.turns == self.max_turns: #game over
+            self.chosen_color = color
             self.lost_game = True
             self.turns = self.max_turns
             for button in self.buttons:
