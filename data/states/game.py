@@ -31,6 +31,7 @@ class Game(tools.States):
         self.table = []
         self.games_won = 0
         self.games_lost = 0
+        self.points = 0
         self.update_label()
         self.lost_game = False
         self.take_turn = True
@@ -45,6 +46,8 @@ class Game(tools.States):
             ).convert()
         self.board_bg.fill((0,0,0))
         
+        
+        
     def update_label(self):
         text = "Turns: {} / {}".format(self.turns, self.max_turns)
         self.turns_text, self.turns_rect = self.make_text(text, (0,0,0), (60, 125), 20)
@@ -56,6 +59,8 @@ class Game(tools.States):
         
         self.games_won_text, self.games_won_rect = self.make_text('Won: {}'.format(self.games_won), (0,0,0), (60, 150), 20)
         self.games_lost_text, self.games_lost_rect = self.make_text('Lost: {}'.format(self.games_lost), (0,0,0), (60, 175), 20)
+        self.points_text, self.points_rect = self.make_text('Points:', (0,0,0), (60, 200), 20)
+        self.points_num_text, self.points_num_rect = self.make_text('{}'.format(self.points), (0,0,0), (60, 225), 20)
         
     def setup_btns(self):
         self.buttons = []
@@ -123,6 +128,8 @@ class Game(tools.States):
                 button.disabled = True
         else:
             self.chosen_color = color
+        if not self.lost_game or self.won_game():
+            self.points += 10
     
     def create_table(self):
         self.table = []
@@ -155,8 +162,9 @@ class Game(tools.States):
         
     def reset_game(self, button_sound=True, counter=True):
         if counter:
-            if self.lost_game:
-                self.games_lost += 1
+            self.games_lost += 1 #lose a game by restarting before finishing
+            #if self.lost_game:
+                #self.games_lost += 1
             if self.won_game():
                 self.games_won += 1
             self.write_save()
@@ -200,6 +208,7 @@ class Game(tools.States):
         if self.won_game():
             for button in self.buttons:
                 button.disabled = True
+        
         if self.lost_game:
             pass
         
@@ -214,6 +223,8 @@ class Game(tools.States):
         screen.blit(self.turns_text, self.turns_rect)
         screen.blit(self.games_won_text, self.games_won_rect)
         screen.blit(self.games_lost_text, self.games_lost_rect)
+        screen.blit(self.points_text, self.points_rect)
+        screen.blit(self.points_num_text, self.points_num_rect)
         if self.lost_game or self.won_game():
             screen.blit(self.overlay, (0,0))
             screen.blit(self.game_over, self.game_over_rect)
@@ -227,13 +238,13 @@ class Game(tools.States):
             data = f.read()
         self.games_won = int(data.split()[0])
         self.games_lost = int(data.split()[1])
-        #self.points = int(data.split()[2])
+        self.points = int(data.split()[2])
         
     def write_save(self):
         #won / loss / points
         path = os.path.join('data', 'save.txt')
         with open(path, 'w') as f:
-            f.write(str(self.games_won) + '\n' + str(self.games_lost))
+            f.write(str(self.games_won) + '\n' + str(self.games_lost) + '\n' + str(self.points))
         
     def cleanup(self):
         pass
