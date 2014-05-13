@@ -168,6 +168,7 @@ class Game(tools.States):
             if self.won_game():
                 self.points += 1000
                 self.games_won += 1
+                self.games_lost -= 1
             self.write_save()
         
         self.counter = 0
