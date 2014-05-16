@@ -46,8 +46,6 @@ class Game(tools.States):
             ).convert()
         self.board_bg.fill((0,0,0))
         
-        self.counter = 0
-        
     def update_label(self):
         text = "Turns: {} / {}".format(self.turns, self.max_turns)
         self.turns_text, self.turns_rect = self.make_text(text, (0,0,0), (60, 125), 20)
@@ -171,7 +169,6 @@ class Game(tools.States):
                 self.games_lost -= 1
             self.write_save()
         
-        self.counter = 0
         self.lost_game = False
         self.turns = 0
         self.create_table()
@@ -203,7 +200,6 @@ class Game(tools.States):
                     
     def update(self, now, keys):
         self.update_label()
-        self.counter = 0
         self.flood(self.current_color, self.chosen_color, 0,0)
         #self.table[0][0].color = pg.Color('black')
         for row in self.table:
