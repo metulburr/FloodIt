@@ -2,15 +2,16 @@
 
 import pygame as pg
 from .. import tools
-from ..toolbox import button, roundrects
+from ..toolbox import button
 import random
 
-class Menu(tools.States):
-    def __init__(self, screen_rect):
+class Options(tools.States):
+    def __init__(self, screen_rect, default):
         tools.States.__init__(self)
+        self.default_screensize = default
         self.screen_rect = screen_rect
-        self.options = ['Play', 'Options', 'Quit']
-        self.next_list = ['GAME', 'OPTIONS']
+        self.options = ['Back']
+        self.next_list = ['MENU']
         self.pre_render_options()
         self.from_bottom = 300
         self.spacer = 35
@@ -21,6 +22,34 @@ class Menu(tools.States):
         
         self.menu_item_bg_w = 200
         self.menu_item_bg_h = 25
+        
+        button_config = {
+            "clicked_font_color" : (0,0,0),
+            "hover_font_color"   : (205,195, 0),
+            'font'               : tools.Font.load('impact.ttf', 18),
+            'font_color'         : (255,255,255),
+            'border_color'       : (0,0,0),
+        }
+        c = (0,0,0) #clicked color for color buttons
+        self.fullscreen_button = button.Button((10,10,105,25),(0,0,100), 
+            self.toggle_fullscreen, text='Fullscreen', clicked_color=(255,255,255), 
+            hover_color=(0,0,130), **button_config
+        )
+        self.window_button = button.Button((10,40,105,25),(0,0,100), 
+            lambda:self.set_window((800, 600)), text='(800, 600)', clicked_color=(255,255,255), 
+            hover_color=(0,0,130), **button_config
+        )
+        self.default_button = button.Button((10,70,105,25),(0,0,100), 
+            lambda:self.set_window(self.default_screensize), text=str(self.default_screensize), clicked_color=(255,255,255), 
+            hover_color=(0,0,130), **button_config
+        )
+        self.buttons = [self.fullscreen_button, self.window_button, self.default_button]
+        
+    def toggle_fullscreen(self):
+        self.change_res = 'fullscreen'
+        
+    def set_window(self, newsize):
+        self.change_res = newsize
 
     def render_cursor(self, screen):
         mouseX, mouseY = pg.mouse.get_pos()
@@ -38,6 +67,8 @@ class Menu(tools.States):
                 
             elif event.key == pg.K_RETURN:
                 self.select_option(self.selected_index)
+        for button in self.buttons:
+            button.check_event(event)
         #elif event.type == self.intro.track_end:
         #    self.intro.track = (self.intro.track+1) % len(self.intro.tracks)
         #    pg.mixer.music.load(self.intro.tracks[self.intro.track]) 
@@ -54,10 +85,10 @@ class Menu(tools.States):
         for i,opt in enumerate(self.rendered["des"]):
             aligned_center = (self.screen_rect.centerx, self.from_bottom+i*self.spacer)
             
-            #for option in self.options:
-            #    w = self.menu_item_bg_w
-            #    h = self.menu_item_bg_h
-            #    roundrects.round_rect(screen, (aligned_center[0]-(w//2), aligned_center[1]-(h//2),w,h), (0,0,0), 5, 2, (50,50,50))
+            for option in self.options:
+                w = self.menu_item_bg_w
+                h = self.menu_item_bg_h
+                #roundrects.round_rect(screen, (aligned_center[0]-(w//2), aligned_center[1]-(h//2),w,h), (0,0,0), 5, 2, (50,50,50))
             opt[1].center =  aligned_center
             if i == self.selected_index:
                 rend_img,rend_rect = self.rendered["sel"][i]
@@ -66,6 +97,8 @@ class Menu(tools.States):
             else:
                 rect = opt[1]
                 screen.blit(opt[0],rect)
+        for button in self.buttons:
+            button.render(screen)
         
         
     def cleanup(self):

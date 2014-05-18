@@ -48,7 +48,10 @@ class Music:
         pg.mixer.music.load(os.path.join(self.path, self.song))
 
 class States:
-    def __init__(self):        
+    def __init__(self):     
+        self.change_res = None  
+        self.res = None
+        
         self.bogus_rect = pg.Surface([0,0]).get_rect()
         self.screen_rect = self.bogus_rect
         self.button_volume = .2
