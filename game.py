@@ -6,7 +6,9 @@ import data.tools
 import argparse
 import sys
 
-parser = argparse.ArgumentParser(description='Boom Arguments')
+CAPTION = 'Flood It'
+
+parser = argparse.ArgumentParser(description='{} Arguments'.format(CAPTION))
 parser.add_argument('-c','--clean', action='store_true', 
     help='Remove all .pyc files and __pycache__ directories')
 parser.add_argument('-f' , '--fullscreen', action='store_true',
@@ -21,19 +23,26 @@ if __name__ == '__main__':
     accepted_difficulty = ['hard', 'medium', 'easy']
     
     if args['difficulty']:
-        if args['difficulty'].lower() in accepted_difficulty:
-            difficulty = args['difficulty'].lower()
-            #print('difficulty: {}'.format(difficulty))
+        diff = args['difficulty'].lower()
+        if diff in accepted_difficulty:
+            difficulty = diff
         else:
-            print('{} is not a valid difficulty option, {}'.format(args['difficulty'], accepted_difficulty))
+            print('{} is not a valid difficulty option, {}'.format(diff, accepted_difficulty))
             sys.exit()
     if args['size']:
         size = args['size']
-        #print('window size: {}'.format(size))
         
     if args['clean']:
         data.tools.clean_files()
     else:
-        main(args['fullscreen'], difficulty, size)
+        settings = { #dict gets update to control class
+            'fullscreen':args['fullscreen'],
+            'difficulty':difficulty,
+            'size'      :size,
+            'caption'   :CAPTION,
+            'resizable' :False,
+        }
+        print(settings)
+        main(**settings)
     pg.quit()
 

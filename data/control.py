@@ -4,17 +4,21 @@ import pygame as pg
 from .states import menu, splash, title, game
 
 class Control():
-    def __init__(self, fullscreen, difficulty, size):
+    def __init__(self, **settings):
+        self.__dict__.update(settings)
         pg.mixer.pre_init(44100, -16, 1, 512)
         pg.init()
         self.monitor = (pg.display.Info().current_w, pg.display.Info().current_h)
-        pg.display.set_caption("Flood It")
-        self.screensize = (int(size[0]), int(size[1]))
-        if fullscreen:
+        pg.display.set_caption(self.caption)
+        self.screensize = (int(self.size[0]), int(self.size[1]))
+        if self.fullscreen:
             self.screen = pg.display.set_mode(self.screensize, pg.FULLSCREEN)
         else:
-            os.environ["SDL_VIDEO_CENTERED"] = "True"
-            self.screen = pg.display.set_mode(self.screensize)
+            if self.resizable:
+                self.screen = pg.display.set_mode(self.screensize, pg.RESIZABLE)
+            else:
+                os.environ["SDL_VIDEO_CENTERED"] = "True"
+                self.screen = pg.display.set_mode(self.screensize)
         self.screen_rect = self.screen.get_rect()
         self.clock = pg.time.Clock()
         self.fps = 60
@@ -29,6 +33,14 @@ class Control():
 
         self.state_name = "SPLASH"
         self.state = self.state_dict[self.state_name]
+        
+    def toggle_fullscreen(self):
+        if not self.fullscreen:
+            self.screen = pg.display.set_mode(self.screensize, pg.FULLSCREEN)
+        else:
+            self.screen = pg.display.set_mode(self.screensize)
+        self.fullscreen = not self.fullscreen
+        self.screen_rect = self.screen.get_rect()
 
     def event_loop(self):
         for event in pg.event.get():
@@ -36,6 +48,12 @@ class Control():
                 self.quit = True
             elif event.type in (pg.KEYDOWN,pg.KEYUP):
                 self.keys = pg.key.get_pressed()
+                
+                if event.key == pg.K_F12:
+                    self.toggle_fullscreen()
+            elif event.type == pg.VIDEORESIZE:
+                self.screen = pg.display.set_mode(event.size, pg.RESIZABLE)
+                self.screen_rect = self.screen.get_rect()
             self.state.get_event(event, self.keys)
 
     def change_state(self):
