@@ -51,6 +51,9 @@ class States:
     def __init__(self):     
         self.change_res = None  
         self.res = None
+        self.sound = True
+        self.music = True
+        self.change_sound = None
         
         self.bogus_rect = pg.Surface([0,0]).get_rect()
         self.screen_rect = self.bogus_rect
@@ -111,7 +114,8 @@ class States:
         for i,opt in enumerate(self.rendered["des"]):
             if opt[1].collidepoint(pg.mouse.get_pos()):
                 if self.last_option != opt:
-                    self.button_hover.sound.play()
+                    if self.sound:
+                        self.button_hover.sound.play()
                     self.last_option = opt
                     
     def mouse_menu_click(self, event):
@@ -147,7 +151,8 @@ class States:
         if i == len(self.next_list):
             self.quit = True
         else:
-            self.button_click.sound.play()
+            if self.sound:
+                self.button_click.sound.play()
             self.next = self.next_list[i]
             self.done = True
             self.selected_index = 0
@@ -165,17 +170,8 @@ class States:
                 self.selected_index = max_ind
             elif self.selected_index > max_ind:
                 self.selected_index = 0
-            self.button_hover.sound.play()
-            
-    def warcraft_font_adjust(self, rect):
-        #warcraft font too high
-        buff = 3
-        rect.y += buff
-        return rect
-
-
-
-
+            if self.sound:
+                self.button_hover.sound.play()
 
 
 def clean_files():

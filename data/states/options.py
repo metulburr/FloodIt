@@ -6,8 +6,9 @@ from ..toolbox import button
 import random
 
 class Options(tools.States):
-    def __init__(self, screen_rect, default):
+    def __init__(self, screen_rect, default, fullscreen):
         tools.States.__init__(self)
+        self.fullscreen = fullscreen
         self.default_screensize = default
         self.screen_rect = screen_rect
         self.options = ['Back']
@@ -35,29 +36,41 @@ class Options(tools.States):
             'clicked_color'      : (255,255,255),
             'hover_color'        : (0,0,130),
         }
-        self.fullscreen_button = button.Button((10,10,105,25),(0,0,100), 
-            self.toggle_fullscreen, text='Fullscreen', **button_config)
-        self.window_button = button.Button((10,40,105,25),(0,0,100), 
+        width = 135
+        height = 25
+        self.fullscreen_toggle = button.Button((10,10,width,height),(0,0,100), 
+            self.toggle_fullscreen, text='Toggle Fullscreen', **button_config)
+        self.window_button = button.Button((10,40,width,height),(0,0,100), 
             lambda:self.set_window((640,360)), text='640x360', **button_config)
-        self.window2_button = button.Button((10,70,105,25),(0,0,100), 
+        self.window2_button = button.Button((10,70,width,height),(0,0,100), 
             lambda:self.set_window((854,480)), text='854x480', **button_config)
-        self.window3_button = button.Button((10,100,105,25),(0,0,100), 
+        self.window3_button = button.Button((10,100,width,height),(0,0,100), 
             lambda:self.set_window((1280,720)), text='1280x720', **button_config)
-        self.default_button = button.Button((10,130,105,25),(0,0,100), 
+        self.default_button = button.Button((10,130,width,height),(0,0,100), 
             lambda:self.set_window(self.default_screensize), text=str(self.default_screensize[0])+'x'+str(self.default_screensize[1]), **button_config)
-        self.buttons = [self.fullscreen_button, self.default_button, self.window_button, 
-            self.window2_button, self.window3_button]
+        self.sound_toggle = button.Button((10,160,width,height),(0,0,100), 
+            self.toggle_sound, text='Sound', **button_config)
+        self.music_toggle = button.Button((10,160,width,height),(0,0,100), 
+            self.toggle_music, text='Music', **button_config)
+        
+        self.buttons = [self.fullscreen_toggle, self.default_button, self.window_button, 
+            self.window2_button, self.window3_button]#, self.sound_toggle, self.music_toggle]
         
         spacer = 30
-        from_top = 100
-        for i, b in enumerate(self.buttons):
-            b.rect.center = (self.screen_rect.x + self.screen_rect.width//2, self.screen_rect.y + i * spacer + from_top)
-        
+        from_top = 80
+        for i, btn in enumerate(self.buttons):
+            btn.rect.center = (self.screen_rect.x + self.screen_rect.width//2, self.screen_rect.y + i * spacer + from_top)
+    
     def toggle_fullscreen(self):
         self.change_res = 'fullscreen'
         
     def set_window(self, newsize):
         self.change_res = newsize
+    def toggle_sound(self):
+        self.change_sound = True
+        #self.sound = not self.sound
+    def toggle_music(self):
+        self.music = not self.music
 
     def render_cursor(self, screen):
         mouseX, mouseY = pg.mouse.get_pos()

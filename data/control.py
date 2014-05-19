@@ -30,28 +30,28 @@ class Control():
             "SPLASH"   : splash.Splash(self.screen_rect),
             'TITLE'    : title.Title(self.screen_rect),
             'GAME'     : game.Game(self.screen_rect),
-            'OPTIONS'  : options.Options(self.screen_rect, self.default_screensize),
+            'OPTIONS'  : options.Options(self.screen_rect, self.default_screensize, self.fullscreen),
         }
 
         self.state_name = "SPLASH"
         self.state = self.state_dict[self.state_name]
-        
-    def toggle_fullscreen(self):
-        pg.display.quit()
-        pg.display.init()
-        if not self.fullscreen:
-            self.screen = pg.display.set_mode(self.screensize, pg.FULLSCREEN)
-        else:
-            self.screen = pg.display.set_mode(self.screensize)
-        self.fullscreen = not self.fullscreen
-        self.screen_rect = self.screen.get_rect()
-    
-    def resize_window(self, newsize):
-        pg.display.quit()
-        pg.display.init()
-        self.fullscreen = False
-        self.screen = pg.display.set_mode(newsize)
-        self.screen_rect = self.screen.get_rect()
+            
+    def check_display_change(self):
+        if self.state.change_res:
+            pg.display.quit()
+            pg.display.init()
+            if self.state.change_res == 'fullscreen':
+                if not self.fullscreen:
+                    self.screen = pg.display.set_mode(self.screensize, pg.FULLSCREEN)
+                else:
+                    self.screen = pg.display.set_mode(self.screensize)
+                self.fullscreen = not self.fullscreen
+                self.screen_rect = self.screen.get_rect()
+            else:
+                self.fullscreen = False
+                self.screen = pg.display.set_mode(self.state.change_res)
+                self.screen_rect = self.screen.get_rect()
+            self.state.change_res = None
 
     def event_loop(self):
         for event in pg.event.get():
@@ -79,12 +79,7 @@ class Control():
         while not self.done:
             if self.state.quit:
                 self.done = True
-            elif self.state.change_res:
-                if self.state.change_res == 'fullscreen':
-                    self.toggle_fullscreen()
-                else:
-                    self.resize_window(self.state.change_res)
-            self.state.change_res = None
+            self.check_display_change()
             now = pg.time.get_ticks()
             self.event_loop()
             self.change_state()
