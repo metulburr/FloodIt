@@ -8,25 +8,23 @@ import shelve
 import sys
         
 class DB:
-    if sys.version[0] == '3':
-        path = os.path.join('data', 'settings3')
-    else:
-        path = os.path.join('data', 'settings2')
+    path = os.path.join('data', 'database{}'.format(sys.version.split()[0]))
+    key = 'database'
     
     @staticmethod
     def exists():
         return os.path.exists(DB.path)
-    
+        
     @staticmethod
-    def save(key, obj):
+    def save(obj):
         db = shelve.open(DB.path)
-        db[key] = obj
+        db[DB.key] = obj
         db.close()
     
     @staticmethod
-    def load(key):
+    def load():
         db = shelve.open(DB.path)
-        obj = db[key]
+        obj = db[DB.key]
         db.close()
         return obj
         

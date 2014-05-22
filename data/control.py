@@ -55,18 +55,16 @@ class Control():
                 self.screen_rect = self.screen.get_rect()
             self.state.change_res = None
             self.save_settings()
-            self.state.setup_buttons() #options state only method (update buttons status)
+            self.state.setup_buttons() #options state only method (update buttons status for ON and OFF)
             
     def save_settings(self):
-        s = {
-            'fullscreen':self.fullscreen,
-            'difficulty':self.difficulty,
-            'size'      :self.screen_rect.size,
-            'caption'   :self.caption,
-            'resizable' :self.resizable,
-        }
-        
-        DB.save('settings', s)
+        db = DB.load()
+        db['fullscreen'] = self.fullscreen
+        db['difficulty'] = self.difficulty
+        db['size']       = self.size
+        db['caption']    = self.caption
+        db['resizable']  = self.resizable
+        DB.save(db)
 
     def event_loop(self):
         for event in pg.event.get():

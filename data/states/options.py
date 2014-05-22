@@ -39,8 +39,7 @@ class Options(tools.States):
         }
         width = 135
         height = 25
-        fullscreen_state = DB.load('settings')['fullscreen']
-        if fullscreen_state:
+        if DB.load()['fullscreen']:
             state = 'OFF'
         else:
             state = 'ON'

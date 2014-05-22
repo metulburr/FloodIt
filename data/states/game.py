@@ -6,6 +6,7 @@ from ..toolbox import button
 from ..components import block
 import os
 import random
+from data.tools import DB
 
 class Game(tools.States):
     def __init__(self, screen_rect): 
@@ -230,22 +231,19 @@ class Game(tools.States):
             screen.blit(self.game_over, self.game_over_rect)
         self.menu_button.render(screen)
 
-
     def load_save(self):
-        #won / loss / points
-        path = os.path.join('data', 'save.txt')
-        with open(path) as f:
-            data = f.read()
-        self.games_won = int(data.split()[0])
-        self.games_lost = int(data.split()[1])
-        self.points = int(data.split()[2])
+        db = DB.load()
+        self.games_won = db['save']['won']
+        self.games_lost = db['save']['lost']
+        self.points = db['save']['points']
         
     def write_save(self):
-        #won / loss / points
-        path = os.path.join('data', 'save.txt')
-        with open(path, 'w') as f:
-            f.write(str(self.games_won) + '\n' + str(self.games_lost) + '\n' + str(self.points))
-        
+        db = DB.load()
+        db['save']['won'] = self.games_won
+        db['save']['lost'] = self.games_lost
+        db['save']['points'] = self.points
+        DB.save(db)
+
     def cleanup(self):
         pass
         
