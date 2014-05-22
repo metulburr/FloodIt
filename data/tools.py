@@ -5,9 +5,13 @@ import os
 import shutil
 import random
 import shelve
+import sys
         
 class DB:
-    path = os.path.join('data', 'settings')
+    if sys.version[0] == '3':
+        path = os.path.join('data', 'settings3')
+    else:
+        path = os.path.join('data', 'settings2')
     
     @staticmethod
     def exists():
