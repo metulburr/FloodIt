@@ -4,6 +4,7 @@ import pygame as pg
 from .. import tools
 from ..toolbox import button
 import random
+from data.tools import DB
 
 class Options(tools.States):
     def __init__(self, screen_rect, default, fullscreen):
@@ -38,8 +39,13 @@ class Options(tools.States):
         }
         width = 135
         height = 25
+        fullscreen_state = DB.load('settings')['fullscreen']
+        if fullscreen_state:
+            state = 'OFF'
+        else:
+            state = 'ON'
         self.fullscreen_toggle = button.Button((10,10,width,height),(0,0,100), 
-            self.toggle_fullscreen, text='Toggle Fullscreen', **button_config)
+            self.toggle_fullscreen, text='Fullscreen: {}'.format(state), **button_config)
         self.window_button = button.Button((10,40,width,height),(0,0,100), 
             lambda:self.set_window((640,360)), text='640x360', **button_config)
         self.window2_button = button.Button((10,70,width,height),(0,0,100), 
@@ -53,8 +59,8 @@ class Options(tools.States):
         self.music_toggle = button.Button((10,160,width,height),(0,0,100), 
             self.toggle_music, text='Music', **button_config)
         
-        self.buttons = [self.fullscreen_toggle, self.default_button, self.window_button, 
-            self.window2_button, self.window3_button]#, self.sound_toggle, self.music_toggle]
+        self.buttons = [self.fullscreen_toggle]#, self.default_button, self.window_button, 
+        #    self.window2_button, self.window3_button]#, self.sound_toggle, self.music_toggle]
         
         spacer = 30
         from_top = 80
@@ -63,7 +69,6 @@ class Options(tools.States):
     
     def toggle_fullscreen(self):
         self.change_res = 'fullscreen'
-        
     def set_window(self, newsize):
         self.change_res = newsize
     def toggle_sound(self):

@@ -4,7 +4,28 @@ import pygame as pg
 import os
 import shutil
 import random
-                    
+import shelve
+        
+class DB:
+    path = os.path.join('data', 'settings')
+    
+    @staticmethod
+    def exists():
+        return os.path.exists(DB.path)
+    
+    @staticmethod
+    def save(key, obj):
+        db = shelve.open(DB.path)
+        db[key] = obj
+        db.close()
+    
+    @staticmethod
+    def load(key):
+        db = shelve.open(DB.path)
+        obj = db[key]
+        db.close()
+        return obj
+        
 class Image:
     path = os.path.join('resources', 'graphics')
     @staticmethod
@@ -172,7 +193,6 @@ class States:
                 self.selected_index = 0
             if self.sound:
                 self.button_hover.sound.play()
-
 
 def clean_files():
     '''remove all pyc files and __pycache__ direcetories in subdirectory'''

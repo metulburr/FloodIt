@@ -2,6 +2,7 @@
 import os
 import pygame as pg
 from .states import menu, splash, title, game, options
+from data.tools import DB
 
 class Control():
     def __init__(self, **settings):
@@ -44,6 +45,7 @@ class Control():
                 if not self.fullscreen:
                     self.screen = pg.display.set_mode(self.screensize, pg.FULLSCREEN)
                 else:
+                    os.environ["SDL_VIDEO_CENTERED"] = "True"
                     self.screen = pg.display.set_mode(self.screensize)
                 self.fullscreen = not self.fullscreen
                 self.screen_rect = self.screen.get_rect()
@@ -52,6 +54,19 @@ class Control():
                 self.screen = pg.display.set_mode(self.state.change_res)
                 self.screen_rect = self.screen.get_rect()
             self.state.change_res = None
+            self.save_settings()
+            self.state.setup_buttons() #options state only method (update buttons status)
+            
+    def save_settings(self):
+        s = {
+            'fullscreen':self.fullscreen,
+            'difficulty':self.difficulty,
+            'size'      :self.screen_rect.size,
+            'caption'   :self.caption,
+            'resizable' :self.resizable,
+        }
+        
+        DB.save('settings', s)
 
     def event_loop(self):
         for event in pg.event.get():
