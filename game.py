@@ -17,6 +17,7 @@ DEFAULT = {
             'won':0,
             'lost':0,
             'points':0,
+            'shortest':None,
         },
 }
 

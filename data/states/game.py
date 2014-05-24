@@ -33,6 +33,9 @@ class Game(tools.States):
         self.games_won = 0
         self.games_lost = 0
         self.points = 0
+        self.timelapse = 0
+        self.timer = 0
+        self.best = DB.load()['save']['shortest']
         self.update_label()
         self.lost_game = False
         self.take_turn = True
@@ -48,18 +51,33 @@ class Game(tools.States):
         self.board_bg.fill((0,0,0))
         
     def update_label(self):
+        
         text = "Turns: {} / {}".format(self.turns, self.max_turns)
         self.turns_text, self.turns_rect = self.make_text(text, (0,0,0), (60, 125), 20)
+        
+        self.sec_timelapse, self.sec_timelapse_rect = self.make_text('Sec: {}'.format(self.timelapse), (0,0,0), (60, 150), 20)
+        
+        #best = DB.load()['save']['shortest']
+        if not self.best:
+            best = None
+        else:
+            best = self.best
+        self.shortest_time_text, self.shortest_time_rect = self.make_text('Best: {}'.format(best), (0,0,0), (60, 175), 20)
         
         msg = 'Game Over'
         if self.won_game():
             msg = 'You Won'
         self.game_over, self.game_over_rect = self.make_text(msg, (255,255,255), self.screen_rect.center, 50)
         
-        self.games_won_text, self.games_won_rect = self.make_text('Won: {}'.format(self.games_won), (0,0,0), (60, 150), 20)
-        self.games_lost_text, self.games_lost_rect = self.make_text('Lost: {}'.format(self.games_lost), (0,0,0), (60, 175), 20)
-        self.points_text, self.points_rect = self.make_text('Points:', (0,0,0), (60, 200), 20)
-        self.points_num_text, self.points_num_rect = self.make_text('{}'.format(self.points), (0,0,0), (60, 225), 20)
+        
+        self.games_won_text, self.games_won_rect = self.make_text('Won: {}'.format(self.games_won), (0,0,0), (60, 200), 20)
+        self.games_lost_text, self.games_lost_rect = self.make_text('Lost: {}'.format(self.games_lost), (0,0,0), (60, 225), 20)
+        self.points_text, self.points_rect = self.make_text('Points:', (0,0,0), (60, 250), 20)
+        self.points_num_text, self.points_num_rect = self.make_text('{}'.format(self.points), (0,0,0), (60, 275), 20)
+        
+        
+        
+        
         
     def setup_btns(self):
         self.buttons = []
@@ -162,14 +180,14 @@ class Game(tools.States):
     def reset_game(self, button_sound=True, counter=True):
         if counter:
             self.games_lost += 1 #lose a game by restarting before finishing
-            #if self.lost_game:
-                #self.games_lost += 1
             if self.won_game():
                 self.points += 1000
                 self.games_won += 1
                 self.games_lost -= 1
+                self.check_best_score()
             self.write_save()
         
+        self.timelapse = 0
         self.lost_game = False
         self.turns = 0
         self.create_table()
@@ -180,6 +198,16 @@ class Game(tools.States):
             button.disabled = False
         if button_sound:
             self.button_click.sound.play()
+            
+    def check_best_score(self):
+        best = DB.load()['save']['shortest']
+        if not best:
+            best = self.timelapse + 1 #change default None to become new best time
+        if self.timelapse < best:
+            db = DB.load()
+            db['save']['shortest'] = self.timelapse
+            DB.save(db)
+            self.best = self.timelapse
         
     def get_event(self, event, keys):
         if event.type == pg.QUIT:
@@ -212,6 +240,11 @@ class Game(tools.States):
         
         if self.lost_game:
             pass
+            
+        if pg.time.get_ticks()-self.timer > 1000:
+            self.timer = pg.time.get_ticks()
+            if not self.won_game() and not self.lost_game:
+                self.timelapse += 1
         
     def render(self, screen):
         screen.fill((self.bg_color))
@@ -226,6 +259,8 @@ class Game(tools.States):
         screen.blit(self.games_lost_text, self.games_lost_rect)
         screen.blit(self.points_text, self.points_rect)
         screen.blit(self.points_num_text, self.points_num_rect)
+        screen.blit(self.sec_timelapse, self.sec_timelapse_rect)
+        screen.blit(self.shortest_time_text, self.shortest_time_rect)
         if self.lost_game or self.won_game():
             screen.blit(self.overlay, (0,0))
             screen.blit(self.game_over, self.game_over_rect)

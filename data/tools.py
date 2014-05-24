@@ -4,29 +4,30 @@ import pygame as pg
 import os
 import shutil
 import random
-import shelve
 import sys
+import json
         
 class DB:
-    path = os.path.join('data', 'database{}'.format(sys.version.split()[0]))
-    key = 'database'
-    
+    dirname = 'save'
+    if not os.path.exists(dirname):
+        os.mkdir(dirname)
+    path = os.path.join(dirname, 'database{}'.format(sys.version.split()[0]))
+    #key = 'database'
     @staticmethod
     def exists():
         return os.path.exists(DB.path)
-        
-    @staticmethod
-    def save(obj):
-        db = shelve.open(DB.path)
-        db[DB.key] = obj
-        db.close()
-    
     @staticmethod
     def load():
-        db = shelve.open(DB.path)
-        obj = db[DB.key]
-        db.close()
+        data = open(DB.path)
+        obj = json.load(data)
+        data.close()
         return obj
+    @staticmethod
+    def save(obj):
+        f = open(DB.path, 'w')
+        f.write(json.dumps(obj))
+        f.close()
+    
         
 class Image:
     path = os.path.join('resources', 'graphics')
