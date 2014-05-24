@@ -1,4 +1,4 @@
-[![Logo](http://i.imgur.com/5ZSGT2V.png)](http://i.imgur.com/5ZSGT2V.png
+[![Logo](http://i.imgur.com/1lV3eFp.png)](http://i.imgur.com/1lV3eFp.png)
 http://www.pygame.org/project-Flood+It-2896-4729.html
 
 ###How to Play
