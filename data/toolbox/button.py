@@ -20,7 +20,7 @@ class Button(object):
         """Various optional customization you can change by passing kwargs."""
         settings = {
             "text"              : None,
-            "font"              : pg.font.Font(None,16),
+            "font"              : None, #pg.font.Font(None,16),
             "call_on_release"   : True,
             "hover_color"       : None,
             "clicked_color"     : None,
